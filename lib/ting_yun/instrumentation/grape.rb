@@ -27,7 +27,8 @@ TingYun::Support::LibraryDetection.defer do
           TingYun::Agent::Transaction.set_default_transaction_name(name, :controller)
           run_without_tingyun(*args)
         rescue => e
-          TingYun::Agent.logger.info("Error getting Grape Endpoint Name. Error: #{e.message}. Options: #{self.options.inspect}")
+          raise e
+          # TingYun::Agent.logger.info("Error getting Grape Endpoint Name. Error: #{e.message}. Options: #{self.options.inspect}")
         end
 
       end
