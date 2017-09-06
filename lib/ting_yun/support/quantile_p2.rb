@@ -9,7 +9,7 @@ module TingYun
         return false if !TingYun::Agent.config[:'nbs.quantile']
         quantile = TingYun::Agent.config[:'nbs.quantile']
         quantile = JSON.parse(quantile) rescue false unless quantile.is_a?(Array)
-        return false if !quantile || quantile.empty? || (quantile.size > quantile.uniq.size) || quantile.any? { |i| i.to_i == 0 || !i.is_a?(Fixnum)}
+        return false if !quantile || quantile.empty? || (quantile.size > quantile.uniq.size) || quantile.any? { |i| i.to_i == 0 || !i.is_a?(Integer)}
         return true
       end
 

@@ -15,7 +15,7 @@ module TingYun
         TingYun::Agent.config[key]
       end
     end
-    
+
 
     class Boolean;
     end
@@ -224,7 +224,7 @@ module TingYun
             :default => DefaultSource.action_tracer_action_threshold,
             :allow_nil => true,
             :public => true,
-            :type => Fixnum,
+            :type => Integer,
             :allowed_from_server => true,
             :description => 'The agent will collect traces for action that exceed this time threshold (in millisecond). Specify a int value or <code><a href="">apdex_f</a></code>.'
         },
@@ -245,7 +245,7 @@ module TingYun
         :'nbs.action_tracer.slow_sql_threshold' => {
             :default => 500,
             :public => true,
-            :type => Fixnum,
+            :type => Integer,
             :allowed_from_server => true,
             :description => 'The agent will collect traces for slow_sql that exceed this time threshold (in millisecond). Specify a int value or <code><a href="">apdex_f</a></code>.'
         },
@@ -259,7 +259,7 @@ module TingYun
         :'nbs.action_tracer.explain_threshold' => {
             :default => 500,
             :public => true,
-            :type => Fixnum,
+            :type => Integer,
             :allowed_from_server => true,
             :description => 'Threshold (in millisecond) above which the agent will collect explain plans. Relevant only when <code><a href="">explain_enabled</a></code> is true.'
         },
@@ -303,7 +303,7 @@ module TingYun
         :'nbs.rum.sample_ratio' => {
             :default => 1,
             :public => true,
-            :type => Fixnum,
+            :type => Integer,
             :allowed_from_server => true,
             :description => 'RUM per'
         },
@@ -318,7 +318,7 @@ module TingYun
         :'nbs.action_tracer.stack_trace_threshold' => {
             :default => 500,
             :public => true,
-            :type => Fixnum,
+            :type => Integer,
             :allowed_from_server => true,
             :description => 'Threshold (in millisecond) above which the agent will collect stack_trace.'
         },
@@ -346,21 +346,21 @@ module TingYun
         :agent_log_file_size => {
             :default => 500,
             :public => true,
-            :type => Fixnum,
+            :type => Integer,
             :allowed_from_server => false,
             :description => "Create a new logfile once it reaches this value. and this value's unit is MB."
         },
         :agent_log_file_number => {
             :default => 10,
             :public => true,
-            :type => Fixnum,
+            :type => Integer,
             :allowed_from_server => false,
             :description => "The remaining number of log file, delete the earliest when more than this value."
         },
         :agent_log_file_check_days => {
             :default => 7,
             :public => true,
-            :type => Fixnum,
+            :type => Integer,
             :allowed_from_server => false,
             :description => "Check for create new logfile when reach days of this value."
         },
@@ -418,7 +418,7 @@ module TingYun
             :default => 8080,
             :allow_nil => true,
             :public => true,
-            :type => Fixnum,
+            :type => Integer,
             :allowed_from_server => false,
             :description => 'Defines a port for communicating with Ting Yun via a proxy server.'
         },
@@ -450,7 +450,7 @@ module TingYun
             :default => DefaultSource.port,
             :allow_nil => true,
             :public => false,
-            :type => Fixnum,
+            :type => Integer,
             :allowed_from_server => false,
             :description => 'Port for the Ting Yun data collection service.'
         },
@@ -464,7 +464,7 @@ module TingYun
         :api_port => {
             :default => value_of(:port),
             :public => false,
-            :type => Fixnum,
+            :type => Integer,
             :allowed_from_server => false,
             :description => 'Port for the TingYun  API host.'
         },
@@ -515,7 +515,7 @@ module TingYun
         :keep_alive_timeout => {
             :default => 60,
             :public => false,
-            :type => Fixnum,
+            :type => Integer,
             :allowed_from_server => false,
             :description => 'Timeout for keep alive on TCP connection to collector if supported by Ruby version. Only used in conjunction when aggressive_keepalive is enabled.'
         },
@@ -538,21 +538,21 @@ module TingYun
         :timeout => {
             :default => 2 * 60, # 2 minutes
             :public => true,
-            :type => Fixnum,
+            :type => Integer,
             :allowed_from_server => false,
             :description => 'Maximum number of seconds to attempt to contact the  collector.'
         },
         :post_size_limit => {
             :default => 2 * 1024 * 1024, # 2MB
             :public => false,
-            :type => Fixnum,
+            :type => Integer,
             :allowed_from_server => false,
             :description => 'Maximum number of bytes to send to the data collection service.'
         },
         :data_report_period => {
             :default => 60,
             :public => false,
-            :type => Fixnum,
+            :type => Integer,
             :allowed_from_server => false,
             :description => 'Number of seconds betwixt connections to the Ting Yun data collection service.'
         },
@@ -601,7 +601,7 @@ module TingYun
         :apdex_t => {
             :default => 500,
             :public => true,
-            :type => Fixnum,
+            :type => Integer,
             :allowed_from_server => true,
             :deprecated => true,
             :description => 'millisecond'
@@ -609,7 +609,7 @@ module TingYun
         :'transaction_tracer.limit_segments' => {
             :default => 2000,
             :public => true,
-            :type => Fixnum,
+            :type => Integer,
             :allowed_from_server => true,
             :description => 'Maximum number of transaction trace nodes to record in a single transaction trace.'
         },
