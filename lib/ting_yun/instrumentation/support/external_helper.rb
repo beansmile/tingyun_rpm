@@ -23,6 +23,12 @@ module TingYun
           end
           guid
         end
+
+        def self.metrics_for_message(product, ip_host, operation)
+          metrics =["AllWeb", "All"]
+          metrics = metrics.map { |suffix| "Message #{product}/NULL/#{suffix}" }
+          metrics.unshift "Message #{product}/#{ip_host}/#{operation}"
+        end
       end
     end
   end

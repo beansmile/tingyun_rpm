@@ -44,12 +44,6 @@ module TingYun
           end
         end
 
-        def self.metrics_for_message(product, ip_host, operation)
-          metrics = TingYun::Agent::Transaction.recording_web_transaction? ? [ALL_WEB, ALL] : [ALL_BACKGROUND, ALL]
-          metrics = metrics.map { |suffix| "Message #{product}/NULL/#{suffix}" }
-          metrics.unshift "Message #{product}/#{ip_host}/#{operation}"
-        end
-
         def self.metrics_for(product, operation, host = UNKNOWN, port = 0, dbname = UNKNOWN, collection = nil,  generic_product = nil )
           dbname ||= UNKNOWN
           host ||= UNKNOWN
