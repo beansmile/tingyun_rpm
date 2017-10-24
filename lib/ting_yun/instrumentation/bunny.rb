@@ -39,8 +39,8 @@ TingYun::Support::LibraryDetection.defer do
             else
               metric_name << "Exchange%2F#{name}/Produce"
             end
-            summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('RabbitMQ', "#{@channel.connection.host}:#{@channel.connection.port}", 'Produce')
-            TingYun::Agent::Transaction.wrap(state, metric_name , :RabbitMq, {}, summary_metrics)  do
+            summary_metrics = TingYun::Instrumentation::Support::ExternalHelper.metrics_for_message('RabbitMQ', "#{@channel.connection.host}:#{@channel.connection.port}", 'Produce')
+            TingYun::Agent::Transaction.wrap(state, metric_name , :RabbitMQ, {}, summary_metrics)  do
               opts[:headers] = {} unless opts[:headers]
               opts[:headers]["TingyunID"] = create_tingyun_id("mq")  if TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
               TingYun::Agent.record_metric("#{metric_name}%2FByte",payload.bytesize) if payload
@@ -89,9 +89,9 @@ TingYun::Support::LibraryDetection.defer do
 
             state.save_referring_transaction_info(tingyun_id_secret.split(';')) if cross_app_enabled?(tingyun_id_secret)
 
-            summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('RabbitMQ', "#{@channel.connection.host}:#{@channel.connection.port}", 'Consume')
+            summary_metrics = TingYun::Instrumentation::Support::ExternalHelper.metrics_for_message('RabbitMQ', "#{@channel.connection.host}:#{@channel.connection.port}", 'Consume')
 
-            TingYun::Agent::Transaction.wrap(state, "Message RabbitMQ/#{metric_name}" , :RabbitMq, {:mq=> true}, summary_metrics)  do
+            TingYun::Agent::Transaction.wrap(state, "Message RabbitMQ/#{metric_name}" , :message, {:mq=> true}, summary_metrics)  do
               TingYun::Agent::Transaction.set_frozen_transaction_name!(transaction_name)
               TingYun::Agent.record_metric("Message RabbitMQ/#{metric_name}%2FByte",args[2].bytesize) if args[2]
               TingYun::Agent.record_metric("Message RabbitMQ/#{metric_name}%2FWait", TingYun::Helper.time_to_millis(Time.now)-state.externel_time.to_i) rescue 0
@@ -147,8 +147,8 @@ TingYun::Support::LibraryDetection.defer do
           begin
             state = TingYun::Agent::TransactionState.tl_get
             metric_name = "#{@connection.host}:#{@connection.port}%2FQueue%2F#{args[0]}/Consume"
-            summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('RabbitMQ', "#{connection.host}:#{connection.port}", 'Consume')
-            TingYun::Agent::Transaction.wrap(state, "Message RabbitMQ/#{metric_name}" , :RabbitMq, {}, summary_metrics)  do
+            summary_metrics = TingYun::Instrumentation::Support::ExternalHelper.metrics_for_message('RabbitMQ', "#{connection.host}:#{connection.port}", 'Consume')
+            TingYun::Agent::Transaction.wrap(state, "Message RabbitMQ/#{metric_name}" , :RabbitMQ, {}, summary_metrics)  do
               basic_get_without_tingyun(*args)
             end
           rescue =>e
