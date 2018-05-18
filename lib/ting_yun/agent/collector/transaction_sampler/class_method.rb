@@ -107,7 +107,8 @@ module TingYun
           def append_backtrace(node, duration)
             if duration*1000 >= Agent.config[:'nbs.action_tracer.stack_trace_threshold']
               trace = caller.reject! { |t| t.include?('tingyun_rpm') }
-              trace = trace.first(20)
+              # freeze here will reduce used memory
+              trace = trace.first(20).map!(&:freeze)
               node[:stacktrace] = trace
             end
           end
