@@ -123,10 +123,12 @@ module TingYun
     #
     # @api public
     #
-    def notice_error(exception, options={})
+    def notice_error(exception, options={:type =>:exception})
       TingYun::Agent::Transaction.notice_error(exception, options)
       nil # don't return a noticed error datastructure. it can only hurt.
     end
+
+
 
     # Register this method as a callback for processes that fork
     # jobs.
@@ -198,6 +200,10 @@ module TingYun
     def add_custom_params(key, value)
       txn = TingYun::Agent::TransactionState.tl_get.current_transaction
       txn.attributes.add_custom_params(key, value) if txn
+    end
+
+    def tl_is_execution_traced?
+      TingYun::Agent::TransactionState.tl_get.execution_traced?
     end
 
   end

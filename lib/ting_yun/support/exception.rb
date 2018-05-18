@@ -40,7 +40,9 @@ module TingYun
         end
       end
 
+      #跨应用错误
       class InternalServerError < StandardError
+
       end
 
     end

@@ -23,7 +23,7 @@ module TingYun
       end
 
       def metric_data(stats_hash, base_quantile_hash)
-        action_array, adpex_array, general_array, components_array, errors_array = build_metric_data_array(stats_hash, base_quantile_hash)
+        action_array, adpex_array, general_array, components_array, errors_array,exception_array = build_metric_data_array(stats_hash, base_quantile_hash)
 
         upload_data = {
             :type => 'perfMetrics',
@@ -34,7 +34,8 @@ module TingYun
             :apdex => adpex_array,
             :components => components_array,
             :general => general_array,
-            :errors  => errors_array
+            :errors  => errors_array,
+            :exceptions  => exception_array
         }
         upload_data.merge!(:config => {"nbs.quantile" => TingYun::Agent.config[:'nbs.quantile']}) if TingYun::Agent.config[:'nbs.quantile']
         result = invoke_remote(:upload, [upload_data])
@@ -53,6 +54,7 @@ module TingYun
         general_array = []
         components_array = []
         errors_array = []
+        exception_array = []
 
         calculate_quantile(base_quantile_hash.hash)
 
@@ -68,6 +70,8 @@ module TingYun
               adpex_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
             elsif metric_spec.name.start_with?('Errors') && metric_spec.scope.empty?
               errors_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
+            elsif metric_spec.name.start_with?('Exception') && metric_spec.scope.empty?
+              exception_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
             else
               if metric_spec.scope.empty?
                 general_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)  unless metric_spec.name.start_with?("View","Middleware","Nested","Rack")
@@ -79,7 +83,7 @@ module TingYun
           end
         end
 
-        [action_array, adpex_array, general_array, components_array, errors_array]
+        [action_array, adpex_array, general_array, components_array, errors_array,exception_array]
       end
 
       def generate_action(metric_spec, stats, metric_id)
@@ -128,6 +132,14 @@ module TingYun
       upload_data = {
           :type => 'errorTraceData',
           :errors => unsent_errors
+      }
+      invoke_remote(:upload, [upload_data], :encoder=> json)
+    end
+
+    def exception_data(unsent_exceptions)
+      upload_data = {
+          :type => 'exceptionTraceData',
+          :exceptions => unsent_exceptions
       }
       invoke_remote(:upload, [upload_data], :encoder=> json)
     end

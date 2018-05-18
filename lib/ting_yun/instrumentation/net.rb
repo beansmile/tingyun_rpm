@@ -31,30 +31,30 @@ TingYun::Support::LibraryDetection.defer do
       alias :request :request_with_tingyun_trace
 
 
-      class << self
-        def get_response_with_tingyun(uri_or_host, path = nil, port = nil, &block)
-          begin
-            get_response_without_tingyun(uri_or_host, path , port , &block)
-          rescue => e
-            ::TingYun::Instrumentation::Support::ExternalError.handle_error(e, "External/#{uri_or_host.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/net%2Fhttp")
-            raise e
-          end
-        end
-        alias get_response_without_tingyun get_response
-        alias get_response get_response_with_tingyun
-
-        def start_with_tingyun(address, *arg, &block)
-          begin
-            start_without_tingyun(address, *arg, &block)
-          rescue => e
-            ::TingYun::Instrumentation::Support::ExternalError.handle_error(e, "External/#{address.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/net%2Fhttp")
-            raise e
-          end
-        end
-        alias :start_without_tingyun :start
-        alias :start :start_with_tingyun
-
-      end
+      # class << self
+      #   def get_response_with_tingyun(uri_or_host, path = nil, port = nil, &block)
+      #     begin
+      #       get_response_without_tingyun(uri_or_host, path , port , &block)
+      #     rescue => e
+      #       ::TingYun::Instrumentation::Support::ExternalError.handle_error(e, "External/#{uri_or_host.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/net%2Fhttp")
+      #       raise e
+      #     end
+      #   end
+      #   alias get_response_without_tingyun get_response
+      #   alias get_response get_response_with_tingyun
+      #
+      #   def start_with_tingyun(address, *arg, &block)
+      #     begin
+      #       start_without_tingyun(address, *arg, &block)
+      #     rescue => e
+      #       # ::TingYun::Instrumentation::Support::ExternalError.handle_error(e, "External/#{address.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/net%2Fhttp")
+      #       raise e
+      #     end
+      #   end
+      #   alias :start_without_tingyun :start
+      #   alias :start :start_with_tingyun
+      #
+      # end
     end
   end
 end

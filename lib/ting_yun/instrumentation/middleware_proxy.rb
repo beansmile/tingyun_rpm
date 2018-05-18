@@ -8,14 +8,27 @@ module TingYun
       include TingYun::Instrumentation::MiddlewareTracing
 
 
+      class RackApp
+        def initialize(middleware_class)
+          @middleware = middleware_class
+        end
+
+        def new(app, *args, &block)
+          middleware_instance = @middleware.new(app, *args, &block)
+          MiddlewareProxy.wrap(middleware_instance)
+        end
+      end
 
       def self.is_sinatra_app?(target)
         defined?(::Sinatra::Base) && target.kind_of?(::Sinatra::Base)
       end
 
       def self.needs_wrapping?(target)
-        !target.respond_to?(:_nr_has_middleware_tracing)
+        !target.respond_to?(:_nr_has_middleware_tracing) &&
+        !is_sinatra_app?(target)
       end
+
+
 
       def self.wrap(target, is_app=false)
         if needs_wrapping?(target)
@@ -25,6 +38,9 @@ module TingYun
         end
       end
 
+      def self.for_class(target_class)
+        RackApp.new(target_class)
+      end
 
       attr_reader :target, :category, :transaction_options
 

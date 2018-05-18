@@ -21,14 +21,15 @@ TingYun::Support::LibraryDetection.defer do
           name = ["Grape",
                   self.options[:method].first,
                   self.options[:for].to_s,
-                  self.namespace.sub(%r{\A/}, ''), # removing leading slashes
-                  self.options[:path].first.sub(%r{\A/}, ''),
+                  self.namespace.to_s.sub(%r{\A/}, ''), # removing leading slashes
+                  self.options[:path].first.to_s.sub(%r{\A/}, ''),
           ].compact.select{ |n| n.to_s unless n.to_s.empty? }.join("/")
           TingYun::Agent::Transaction.set_default_transaction_name(name, :controller)
           run_without_tingyun(*args)
         rescue => e
+          TingYun::Agent.logger.info("Error getting Grape Endpoint Name. Error: #{e.message}. Options: #{self.options.inspect}")
+          TingYun::Agent.notice_error(e,:type=>:exception)
           raise e
-          # TingYun::Agent.logger.info("Error getting Grape Endpoint Name. Error: #{e.message}. Options: #{self.options.inspect}")
         end
 
       end

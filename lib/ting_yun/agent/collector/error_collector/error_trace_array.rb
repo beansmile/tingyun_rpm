@@ -12,6 +12,8 @@ module TingYun
           @errors = []
         end
 
+
+
         def enabled?
           ::TingYun::Agent.config[:'nbs.error_collector.enabled']
         end

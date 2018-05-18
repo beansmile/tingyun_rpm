@@ -51,6 +51,7 @@ module TingYun
           @service.session do # use http keep-alive
             harvest_and_send_errors
             harvest_and_send_external_errors
+            harvest_and_send_exceptions
             harvest_and_send_timeslice_data
             harvest_and_send_transaction_traces
             harvest_and_send_slowest_sql
@@ -64,6 +65,11 @@ module TingYun
         def harvest_and_send_errors
           harvest_and_send_from_container(@error_collector.error_trace_array, :error_data)
         end
+
+        def harvest_and_send_exceptions
+          harvest_and_send_from_container(@error_collector.exception_error_array, :exception_data)
+        end
+
 
         def harvest_and_send_external_errors
           harvest_and_send_from_container(@error_collector.external_error_array, :external_error_data)

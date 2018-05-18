@@ -25,7 +25,12 @@ module TingYun
         end
 
         def self.metrics_for_message(product, ip_host, operation)
-          metrics =["AllWeb", "All"]
+          if TingYun::Agent::Transaction.recording_web_transaction?
+            metrics =["AllWeb", "All"]
+          else
+            metrics =["AllBackground", "All"]
+          end
+
           metrics = metrics.map { |suffix| "Message #{product}/NULL/#{suffix}" }
           metrics.unshift "Message #{product}/#{ip_host}/#{operation}"
         end

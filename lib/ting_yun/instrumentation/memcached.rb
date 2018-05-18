@@ -28,7 +28,7 @@ TingYun::Support::LibraryDetection.defer do
   named :memcached
 
   depends_on do
-    defined?(::Memcached) || (defined?(::Dalli) && defined?(::Dalli::Client)) && false
+    defined?(::Memcached) || (defined?(::Dalli) && defined?(::Dalli::Client))
   end
 
   depends_on do

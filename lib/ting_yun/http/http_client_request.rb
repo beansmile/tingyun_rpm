@@ -1,7 +1,7 @@
-require 'ting_yun/http/generic_request'
+require 'ting_yun/http/abstract_request'
 module TingYun
   module Http
-    class HttpClientRequest < GenericRequest
+    class HttpClientRequest < AbstractRequest
       attr_reader :method, :header
 
       def initialize(proxy, *args, &block)

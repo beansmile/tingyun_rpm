@@ -7,7 +7,7 @@ TingYun::Support::LibraryDetection.defer do
   depends_on do
     defined?(::Rake)&&
         !::TingYun::Agent.config[:'disable_rake'] &&
-        ::TingYun::Agent.config[:'rake.tasks'].any? &&
+        ::TingYun::Agent::Instrumentation::RakeInstrumentation.supported_instrument? &&
         ::TingYun::Agent::Instrumentation::RakeInstrumentation.supported_version?
   end
 
@@ -59,9 +59,9 @@ module TingYun
         end
 
         def self.should_trace? name
-          TingYun::Agent.config[:'rake.tasks'].any? do |task|
-            task == name
-          end
+          return ::TingYun::Agent.config[:'rake.tasks'].include?(name) if ::TingYun::Agent.config[:'rake.tasks'].any?
+          return !TingYun::Agent.config[:'rake.black.tasks'].include?(name) if ::TingYun::Agent.config[:'rake.black.tasks'].any?
+          return false
         end
 
         def self.ensure_at_exit
@@ -105,6 +105,10 @@ module TingYun
               end
             end
           end
+        end
+
+        def self.supported_instrument?
+          ::TingYun::Agent.config[:'rake.tasks'].any? or ::TingYun::Agent.config[:'rake.black.tasks'].any?
         end
       end
     end

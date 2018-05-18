@@ -39,14 +39,14 @@ module TingYun
       end
 
 
-      # def use_with_tingyun(middleware_class, *args, &blk)
-      #   if ::TingYun::Instrumentation::RackHelpers.middleware_instrumentation_enabled?
-      #     wrapped_middleware_class = ::TingYun::Instrumentation::MiddlewareProxy.for_class(middleware_class)
-      #     use_without_tingyun(wrapped_middleware_class, *args, &blk)
-      #   else
-      #     use_without_tingyun(middleware_class, *args, &blk)
-      #   end
-      # end
+      def use_with_tingyun(middleware_class, *args, &blk)
+        if ::TingYun::Instrumentation::RackHelpers.middleware_instrumentation_enabled?
+          wrapped_middleware_class = ::TingYun::Instrumentation::MiddlewareProxy.for_class(middleware_class)
+          use_without_tingyun(wrapped_middleware_class, *args, &blk)
+        else
+          use_without_tingyun(middleware_class, *args, &blk)
+        end
+      end
 
       # We patch this method for a reason that actually has nothing to do with
       # instrumenting rack itself. It happens to be a convenient and
@@ -99,8 +99,8 @@ TingYun::Support::LibraryDetection.defer do
         alias_method :run_without_tingyun, :run
         alias_method :run, :run_with_tingyun
         #
-        # alias_method :use_without_tingyun, :use
-        # alias_method :use, :use_with_tingyun
+        alias_method :use_without_tingyun, :use
+        alias_method :use, :use_with_tingyun
       end
 
     end

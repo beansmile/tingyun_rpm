@@ -228,8 +228,8 @@ module TingYun
             begin
               yield
             rescue => e
-              ::TingYun::Agent.notice_error(e)
-              raise
+              ::TingYun::Agent.notice_error(e,:type=> :exception)
+              raise e
             end
           ensure
             TingYun::Agent::Transaction.stop(state)
@@ -245,7 +245,7 @@ module TingYun
           txn_options[:request] ||= trace_options[:request] if trace_options[:request]
           txn_options[:filtered_params] = trace_options[:params]
           txn_options[:transaction_name] = TingYun::Instrumentation::Support::TransactionNamer.name_for(nil, self, category, trace_options)
-          txn_options[:apdex_start_time] = Time.now
+          txn_options[:apdex_start_time] = Time.now.to_f
 
           txn_options
         end
