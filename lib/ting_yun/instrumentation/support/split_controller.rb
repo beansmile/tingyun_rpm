@@ -15,6 +15,7 @@ module TingYun
         }
 
         RULE = {
+          0=> :any,
           1=> :eql?,
           2=> :start_with?,
           3=> :end_with?,
@@ -67,6 +68,7 @@ module TingYun
 
         def raise_error(_v, _r, _v2, _t)
           raise 'this param unexist so the rule is unmatched' if _v.nil? or _v2.nil? or _v2.strip.empty? rescue false
+          return if _v && _r==:any
           unless _t == 0
             raise 'this param  is unmatched  with the rule' unless _v.send(_r, _v2)
           end
@@ -80,9 +82,9 @@ module TingYun
           name << split_url(path.split('/'))
           name << "?"
           name << split_params(@rule["split"]["urlParams"], params)
+          name << split_header(@rule["split"]["headerParams"], header)
           name << split_params(@rule["split"]["bodyParams"], params)
           name << split_params(@rule["split"]["cookieParams"], cookie)
-          name << split_header(@rule["split"]["headerParams"], header)
           name = name[0..-2] << split_method
           name.strip
         end

@@ -36,9 +36,6 @@ module TingYun
           node = start_trace(state, t0, request)
           response = yield
           capture_exception(response, request)
-        rescue => e
-          klass = "External/#{request.uri.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/#{request.from}"
-          handle_error(e, klass)
         ensure
           finish_trace(state, t0, node, request, response)
         end
@@ -54,6 +51,7 @@ module TingYun
       end
 
       def finish_trace(state, t0, node, request, response)
+
         t1 = Time.now.to_f
         duration = (t1- t0) * 1000
         state.timings.external_duration = duration

@@ -1,14 +1,15 @@
-  # encoding: utf-8
+# encoding: utf-8
 require 'ting_yun/agent/transaction/trace_node'
 require 'ting_yun/support/helper'
 require 'ting_yun/support/coerce'
 require 'ting_yun/agent/database'
+require 'set'
 module TingYun
   module Agent
     class Transaction
       class Trace
 
-        attr_accessor :root_node, :node_count, :threshold, :guid, :attributes, :start_time, :finished
+        attr_accessor :root_node, :node_count, :threshold, :guid, :attributes, :start_time, :finished, :array_size,:e_set
 
         def initialize(start_time)
           @start_time = start_time
@@ -16,6 +17,7 @@ module TingYun
           @prepared = false
           @guid = generate_guid
           @root_node = TingYun::Agent::Transaction::TraceNode.new(0.0, "ROOT")
+          @e_set = Set.new
         end
 
         def create_node(time_since_start, metric_name = nil)
@@ -31,7 +33,7 @@ module TingYun
         EMPTY_STRING = ''.freeze
 
         include TingYun::Support::Coerce
-        
+
         def trace_tree
           [
               @start_time.round,
@@ -50,7 +52,7 @@ module TingYun
               encoder.encode(trace_tree),
               attributes.agent_attributes[:tx_id],
               guid
-          ]
+          ] + array_size
         end
 
         def prepare_to_send!
@@ -109,6 +111,23 @@ module TingYun
           return {} unless TingYun::Agent.config['nbs.capture_params']
           attributes.request_params
         end
+
+        def add_errors(errors)
+          errors.each do |error|
+            unless @e_set.member? error.object_id
+              @e_set.add error.object_id
+              root_node.add_error(error)
+            end
+          end
+        end
+
+        def add_errors_to_current_node(state, error)
+          unless @e_set.member? error.object_id
+            @e_set.add error.object_id
+            state.transaction_sample_builder.current_node.add_error(error)
+          end
+        end
+
 
         HEX_DIGITS = (0..15).map{|i| i.to_s(16)}
         GUID_LENGTH = 16

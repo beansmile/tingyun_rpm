@@ -1,7 +1,7 @@
-require 'ting_yun/http/generic_request'
+require 'ting_yun/http/abstract_request'
 module TingYun
   module Http
-    class NetHttpRequest < GenericRequest
+    class NetHttpRequest < AbstractRequest
       def initialize(connection, request)
         @connection = connection
         @request = request

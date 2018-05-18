@@ -60,6 +60,7 @@ module TingYun
             events.notify(:cross_app_before_call, env)
           end
           TingYun::Agent::Transaction.start(state, category, build_transaction_options(env, first_middleware))
+
           result = (target == self) ? traced_call(env) : target.call(env)
 
           if first_middleware
@@ -70,7 +71,7 @@ module TingYun
 
           result
         rescue Exception => e
-          TingYun::Agent.notice_error(e)
+          TingYun::Agent.notice_error(e,:type=>:error)
           raise e
         ensure
           TingYun::Agent::Transaction.stop(state)

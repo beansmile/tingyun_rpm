@@ -25,10 +25,10 @@ module TingYun
         frame
       end
 
-      def pop_frame(state, expected_frame, name, time, deduct_call_time_from_parent=true, klass_name=nil)
+      def pop_frame(state, expected_frame, name, time, deduct_call_time_from_parent=true, klass_name=nil, error = nil)
         frame = fetch_matching_frame(expected_frame)
         note_children_time(frame, time, deduct_call_time_from_parent)
-        transaction_sampler.notice_pop_frame(state, name, time, klass_name) if sampler_enabled?
+        transaction_sampler.notice_pop_frame(state, name, time, klass_name, error) if sampler_enabled?
         frame.name = name
         frame
       end

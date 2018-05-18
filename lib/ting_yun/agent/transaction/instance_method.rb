@@ -14,6 +14,10 @@ module TingYun
         end
 
         def create_nested_frame(state, category, options)
+
+          if options[:filtered_params] && !options[:filtered_params].empty?
+            attributes.merge_request_parameters(options[:filtered_params])
+          end
           @has_children = true
           frame_stack.push TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_header(state, Time.now.to_f)
           name_last_frame(options[:transaction_name])
@@ -71,7 +75,7 @@ module TingYun
 
         def record_summary_metrics(state, outermost_node_name,end_time)
           unless @frozen_name == outermost_node_name
-            time = (end_time.to_f - start_time.to_f) * 1000
+            time = (end_time - start_time) * 1000
             @metrics.record_unscoped(@frozen_name, time)
             if @frozen_name.start_with?('WebAction')
               state.current_transaction.base_quantile_hash[@frozen_name] = time
@@ -79,7 +83,7 @@ module TingYun
           end
         end
 
-        def assign_agent_attributes
+        def assign_agent_attributes(state)
 
           @attributes.add_agent_attribute(:threadName,  "pid-#{$$}");
 
@@ -89,7 +93,7 @@ module TingYun
 
           @attributes.add_agent_attribute(:tx_id,  @guid);
           @attributes.add_agent_attribute(:metric_name,  best_name);
-
+          @attributes.add_agent_attribute(:trace_id, state.trace_id || "0")
         end
 
 
@@ -131,7 +135,7 @@ module TingYun
           unless @frozen_name
             @frozen_name = best_name
           end
-
+          @frozen_name = CONTROLLER_PREFIX + @frozen_name unless @frozen_name.start_with? CONTROLLER_PREFIX,BACKGROUND_PREFIX
           yield if block_given?
         end
 

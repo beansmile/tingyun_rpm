@@ -10,7 +10,7 @@ module TingYun
         attr_accessor :apdex_start, :transaction_start_time
 
         def initialize(start, transaction_start)
-          @apdex_start = start || transaction_start
+          @apdex_start = (start || transaction_start).to_f
           @transaction_start_time = transaction_start
         end
 

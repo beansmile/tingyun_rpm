@@ -27,13 +27,14 @@ module TingYun
           txn = state.current_transaction
           if txn
             txn.exceptions.notice_error(e, options)
+            state.transaction_sample_builder.trace.add_errors_to_current_node(state,e) rescue nil
           elsif TingYun::Agent.instance
             TingYun::Agent.instance.error_collector.notice_error(e, options)
           end
         end
 
 
-        def stop(state, end_time = Time.now, summary_metric_names=[])
+        def stop(state, end_time = Time.now.to_f, summary_metric_names=[])
 
           txn = state.current_transaction
 
@@ -48,23 +49,23 @@ module TingYun
             txn.stop(state, end_time, nested_frame, summary_metric_names)
             state.reset
           else
-            nested_name = nested_transaction_name(nested_frame.name)
+            nested_name = Transaction.nested_transaction_name nested_frame.name
 
-            if nested_name.start_with?(MIDDLEWARE_PREFIX)
-              summary_metrics = MIDDLEWARE_SUMMARY_METRICS
-            else
-              summary_metrics = EMPTY_SUMMARY_METRICS
-            end
-            summary_metrics = summary_metric_names unless summary_metric_names.empty?
+            # if nested_name.start_with?(MIDDLEWARE_PREFIX)
+            #   summary_metrics = MIDDLEWARE_SUMMARY_METRICS
+            # else
+            #   summary_metrics = EMPTY_SUMMARY_METRICS
+            # end
+            # summary_metrics = summary_metric_names unless summary_metric_names.empty?
 
             TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_footer(
                 state,
-                nested_frame.start_time.to_f,
+                nested_frame.start_time,
                 nested_name,
-                summary_metrics,
+                EMPTY_SUMMARY_METRICS,
                 nested_frame,
                 NESTED_TRACE_STOP_OPTIONS,
-                end_time.to_f)
+                end_time)
 
           end
 
@@ -83,11 +84,11 @@ module TingYun
             # to be absolutely sure we don't report agent problems as app errors
             yield
           rescue => e
-            Transaction.notice_error(e)
+            ::TingYun::Agent.notice_error(e,:type=> :exception)
             raise e
           ensure
             # when kafka consumer in task, drop original web_action
-            Transaction.stop(state, Time.now, summary_metrics) if state.current_transaction
+            Transaction.stop(state, Time.now.to_f, summary_metrics) if state.current_transaction
           end
         end
 
@@ -100,10 +101,6 @@ module TingYun
           else
             txn = start_new_transaction(state, category, options)
           end
-
-          # merge params every step into here
-          txn.attributes.merge_request_parameters(options[:filtered_params])
-
           txn
         rescue => e
           TingYun::Agent.logger.error("Exception during Transaction.start", e)

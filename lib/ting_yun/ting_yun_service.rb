@@ -37,7 +37,7 @@ module TingYun
 
       @license_key = license_key || TingYun::Agent.config[:'license_key']
       @request_timeout = TingYun::Agent.config[:timeout]
-      @data_version = TingYun::VERSION::STRING
+      @data_version = "1.4"
       @marshaller =TingYun::Support::Serialize::JsonMarshaller.new
       @metric_id_cache = {}
       @quantile_cache = {}

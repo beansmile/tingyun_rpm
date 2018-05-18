@@ -634,12 +634,19 @@ module TingYun
             :allowed_from_server => true,
             :description => 'trace ID of crossing apps'
         },
+        :'naming.rules_enabled' => {
+            :default => false,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => false,
+            :description => 'Enable or disable of the naming.rules function'
+        },
         :'nbs.naming.rules' => {
             :default => "[]",
             :public => true,
             :type => String,
             :allowed_from_server => true,
-            :description => 'defined nme rule '
+            :description => 'defined name rule '
         },
         :disable_rake => {
             :default => true,
@@ -654,6 +661,13 @@ module TingYun
             :type => Array,
             :allowed_from_server => false,
             :description => 'Specify an array of Rake tasks to automatically instrument.'
+        },
+        :'rake.black.tasks' => {
+            :default => [],
+            :public => true,
+            :type => Array,
+            :allowed_from_server => false,
+            :description => 'Specify an array of Rake tasks to automatically uninstrument.'
         },
         :'nbs.transaction_tracer.thrift' =>{
             :default => true,
@@ -682,6 +696,13 @@ module TingYun
             :type => Boolean,
             :allowed_from_server => true,
             :description => 'Enable or disable the  mq feature'
+        },
+        :'nbs.exception.stack_enabled' => {
+            :default => false,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => true,
+            :description => 'Enable or disable the  exception trace'
         }
     }.freeze
   end

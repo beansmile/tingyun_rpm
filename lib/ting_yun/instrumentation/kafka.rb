@@ -98,7 +98,7 @@ TingYun::Support::LibraryDetection.defer do
               TingYun::Agent.logger.error("Failed to kafka each_message in client : ", e)
               block.call(message)
             ensure
-              TingYun::Agent::Transaction.stop(state, Time.now, summary_metrics)
+              TingYun::Agent::Transaction.stop(state, Time.now.to_f, summary_metrics)
             end
           end
           each_message_without_tingyun(*args, **options, &wrap_block)
@@ -127,7 +127,7 @@ TingYun::Support::LibraryDetection.defer do
                 TingYun::Agent.logger.error("Failed to Bunny call_with_tingyun : ", e)
                 block.call(message)
               ensure
-                TingYun::Agent::Transaction.stop(state, Time.now, summary_metrics)
+                TingYun::Agent::Transaction.stop(state, Time.now.to_f, summary_metrics)
               end
             end
             if options.empty? && args.empty?
@@ -158,7 +158,7 @@ TingYun::Support::LibraryDetection.defer do
                 TingYun::Agent.logger.error("Failed to Bunny call_with_tingyun : ", e)
                 block.call(batch)
               ensure
-                TingYun::Agent::Transaction.stop(state, Time.now, summary_metrics)
+                TingYun::Agent::Transaction.stop(state, Time.now.to_f, summary_metrics)
               end
             end
             if options.empty? && args.empty?

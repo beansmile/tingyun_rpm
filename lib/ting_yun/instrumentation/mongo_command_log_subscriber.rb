@@ -60,6 +60,7 @@ module TingYun
       def log_notification_error(event_type, error)
         TingYun::Agent.logger.error("Error during MongoDB #{event_type} event:")
         TingYun::Agent.logger.log_exception(:error, error)
+        TingYun::Agent.notice_error(error,:type=>:exception)
       end
 
 

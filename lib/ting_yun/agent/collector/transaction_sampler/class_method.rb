@@ -7,17 +7,17 @@ module TingYun
         module ClassMethod
 
 
-          def notice_push_frame(state, time=Time.now)
+          def notice_push_frame(state, time=Time.now.to_f)
             builder = state.transaction_sample_builder
             return unless builder
-            builder.trace_entry(time.to_f)
+            builder.trace_entry(time)
           end
 
           # Informs the transaction sample builder about the end of a traced frame
-          def notice_pop_frame(state, frame, time = Time.now, klass_name=nil)
+          def notice_pop_frame(state, frame, time = Time.now.to_f, klass_name=nil, error = nil)
             builder = state.transaction_sample_builder
             return unless builder
-            builder.trace_exit(frame, time.to_f, klass_name)
+            builder.trace_exit(frame, time, klass_name, error)
           end
 
 

@@ -5,7 +5,7 @@ require 'ting_yun/agent/transaction/trace'
 
 module TingYun
   module Agent
-    class TransactionSampleBuilder
+    class  TransactionSampleBuilder
 
       class PlaceholderNode
         attr_reader :parent_node
@@ -28,21 +28,21 @@ module TingYun
 
       attr_reader :current_node, :trace
 
-      def initialize(time=Time.now)
-        @trace = TingYun::Agent::Transaction::Trace.new(time.to_f)
-        @trace_start = time.to_f
+      def initialize(time=Time.now.to_f)
+        @trace = TingYun::Agent::Transaction::Trace.new(time)
+        @trace_start = time
         @current_node = @trace.root_node
       end
 
       def trace_entry(time)
         if @trace.node_count == 0
-          node = @trace.create_node(time.to_f - @trace_start)
+          node = @trace.create_node(time - @trace_start)
           @trace.root_node = node
           @current_node = node
           return @current_node
         end
         if @trace.node_count < node_limit
-          node = @trace.create_node(time.to_f - @trace_start)
+          node = @trace.create_node(time - @trace_start)
           @current_node.add_called_node(node)
           @current_node = node
 
@@ -59,7 +59,7 @@ module TingYun
         @current_node
       end
 
-      def trace_exit(metric_name, time, klass_name)
+      def trace_exit(metric_name, time, klass_name, error = nil)
         if @current_node.is_a?(PlaceholderNode)
           @current_node.depth -= 1
           if @current_node.depth == 0
@@ -68,8 +68,17 @@ module TingYun
         else
           @current_node.metric_name = metric_name
           @current_node.klass = klass_name
-          @current_node.end_trace(time.to_f - @trace_start)
+          @current_node.end_trace(time - @trace_start)
           @current_node = @current_node.parent_node
+        end
+        if error
+          unless trace.e_set.member? error.object_id
+            trace.e_set.add error.object_id
+            @current_node["exception"] << {"message" => error.message,
+                                           "class" => error.class.to_s,
+                                           "stacktrace"=> error.backtrace
+            }
+          end
         end
       end
 

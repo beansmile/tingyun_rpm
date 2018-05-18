@@ -117,7 +117,7 @@ TingYun::Support::LibraryDetection.defer do
 
 
           result = receive_message_without_tingyun(result_klass)
-          unless result || result.success
+          unless result && result.success
             e = ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, "#{operate} failed: unknown result")
             ::TingYun::Instrumentation::Support::ExternalError.handle_error(e,metrics(operate)[0])
           end

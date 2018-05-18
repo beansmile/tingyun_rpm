@@ -31,7 +31,7 @@ module TingYun
       TASK_PREFIX = 'OtherTransaction/Background/'.freeze
       RACK_PREFIX = 'Rack/'.freeze
       SINATRA_PREFIX = 'WebAction/Sinatra/'.freeze
-      MIDDLEWARE_PREFIX = 'Middleware/Rack/'.freeze
+      MIDDLEWARE_PREFIX = 'Middleware/'.freeze
       GRAPE_PREFIX = 'WebAction/Grape/'.freeze
       RAKE_PREFIX = 'WebAction/Rake'.freeze
       CABLE_PREFIX = 'WebAction/ActionCable'.freeze
@@ -66,7 +66,7 @@ module TingYun
 
 
       def initialize(category, client_transaction_id, options)
-        @start_time = Time.now
+        @start_time = Time.now.to_f
 
         @exceptions = TingYun::Agent::Transaction::Exceptions.new
         @metrics = TingYun::Agent::TransactionMetrics.new
@@ -129,21 +129,21 @@ module TingYun
           trace_options = TRACE_OPTIONS_UNSCOPED
         end
 
-        if name.start_with?(MIDDLEWARE_PREFIX)
-          summary_metrics_with_exclusive_time = MIDDLEWARE_SUMMARY_METRICS
-        else
-          summary_metrics_with_exclusive_time = EMPTY_SUMMARY_METRICS
-        end
-        summary_metrics_with_exclusive_time = summary_metrics unless summary_metrics.empty?
+        # if name.start_with?(MIDDLEWARE_PREFIX)
+        #   summary_metrics_with_exclusive_time = MIDDLEWARE_SUMMARY_METRICS
+        # else
+        #   summary_metrics_with_exclusive_time = EMPTY_SUMMARY_METRICS
+        # end
+        # summary_metrics_with_exclusive_time = summary_metrics unless summary_metrics.empty?
 
         TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_footer(
             state,
-            start_time.to_f,
+            start_time,
             name,
-            summary_metrics_with_exclusive_time,
+            EMPTY_SUMMARY_METRICS,
             outermost_frame,
             trace_options,
-            end_time.to_f)
+            end_time)
 
         commit(state, end_time, name)
       end
@@ -151,20 +151,20 @@ module TingYun
 
       def commit(state, end_time, outermost_node_name)
 
-        assign_agent_attributes
+        assign_agent_attributes(state)
 
 
-        TingYun::Agent.instance.transaction_sampler.on_finishing_transaction(state, self, end_time)
+        TingYun::Agent.instance.transaction_sampler.on_finishing_transaction(state, self, end_time,@exceptions)
 
         TingYun::Agent.instance.sql_sampler.on_finishing_transaction(state, @frozen_name)
 
-        record_summary_metrics(state, outermost_node_name, end_time)
+        record_summary_metrics(state, outermost_node_name, end_time) unless @exceptions.had_error?
         @apdex.record_apdex(@frozen_name, end_time, @exceptions.had_error?)
         @exceptions.record_exceptions(@attributes)
 
 
         TingYun::Agent.instance.stats_engine.merge_transaction_metrics!(@metrics, best_name)
-        TingYun::Agent.instance.stats_engine.record_base_quantile(@base_quantile_hash) if @exceptions.exceptions.empty?
+        TingYun::Agent.instance.stats_engine.record_base_quantile(@base_quantile_hash) unless @exceptions.had_error?
       end
 
     end

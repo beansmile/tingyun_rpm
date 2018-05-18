@@ -80,8 +80,7 @@ TingYun::Support::LibraryDetection.defer do
   depends_on do
     defined?(::ActiveRecord) && defined?(::ActiveRecord::Base) &&
         (!defined?(::ActiveRecord::VERSION) ||
-            ::ActiveRecord::VERSION::MAJOR.to_i <= 3 ||
-            (defined?(::Sinatra) && defined?(::Sinatra::Base) && TingYun::Instrumentation::Support::SinatraHelper.version_supported?))
+            ::ActiveRecord::VERSION::MAJOR.to_i <= 3)
   end
 
   executes do

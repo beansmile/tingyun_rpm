@@ -84,7 +84,7 @@ module TingYun
 
         if type == String
           self[config_key] = value
-        elsif type == Fixnum
+        elsif type == Integer
           self[config_key] = value.to_i
         elsif type == Float
           self[config_key] = value.to_f
